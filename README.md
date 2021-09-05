@@ -1,6 +1,6 @@
 # denops-voicevox
 
-Talk text on [Vicevox](https://voicevox.hiroshiba.jp)
+Talk text on [Vicevox](https://voicevox.hiroshiba.jp) from [Vim](https://vim.org)
 
 Sample movie is https://github.com/raa0121/denops-voicevox/issues/1
 

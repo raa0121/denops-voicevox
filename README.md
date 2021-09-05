@@ -31,7 +31,7 @@ call dein#add('raa0121/denops-voivevox')
 
 ## Config
 ```vim
-let g:voicevox_api_entrypoint = 'http://localhost:50012/' " ( default: http://127.0.0.1:50021/ )
+let g:voicevox_api_entrypoint = 'http://localhost:50021/' " ( default: http://127.0.0.1:50021/ )
 let g:voicevox_speaker = 0 " speaker: 0 => 四国めたん, 1 => ずんだもん ( default: 1 )
 ```
 

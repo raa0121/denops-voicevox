@@ -45,21 +45,25 @@ export async function main(denops: Denops): Promise<void> {
 }
 
 async function audioQuery(denops: Denops, text: string) : Promise<apiTypes.AudioQueryRes> {
-  const API_BASE: string = await vars.g.get(denops, "voicevox_api_entrypoint") ||
-    "http://127.0.0.1:50021/";
+  const API_BASE = await vars.g.get(denops, "voicevox_api_entrypoint", "http://127.0.0.1:50021/");
+  const speaker = await vars.g.get(denops, "voicevox_speaker", 1);
+  ensureString(API_BASE);
+  ensureNumber(speaker);
   const api = ky.default.create({ prefixUrl: API_BASE });
   const result = await api.post("audio_query", {
     searchParams: {
       text: text,
-      speaker: 1
+      speaker: speaker,
     },
   }).json<apiTypes.AudioQueryRes>();
   return result;
 }
 
 async function synthesis(denops: Denops, query: apiTypes.AudioQueryRes) : Promise<FileInfo> {
-  const API_BASE: string = await vars.g.get(denops, "voicevox_api_entrypoint") ||
-    "http://127.0.0.1:50021/";
+  const API_BASE = await vars.g.get(denops, "voicevox_api_entrypoint", "http://127.0.0.1:50021/");
+  const speaker = await vars.g.get(denops, "voicevox_speaker", 1);
+  ensureString(API_BASE);
+  ensureNumber(speaker);
   const api = ky.default.create({ prefixUrl: API_BASE });
   const headers = new Headers({
     'Accept': 'audio/wav'
@@ -71,7 +75,7 @@ async function synthesis(denops: Denops, query: apiTypes.AudioQueryRes) : Promis
     json: query,
     headers: headers,
     searchParams: {
-      speaker: 1,
+      speaker: speaker,
     },
   })
   .arrayBuffer()

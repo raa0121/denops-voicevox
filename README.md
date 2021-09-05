@@ -2,6 +2,8 @@
 
 Talk text on [Vicevox](https://voicevox.hiroshiba.jp)
 
+Sample movie is https://github.com/raa0121/denops-voicevox/issues/1
+
 ## Usage
 ```
 :VoicevoxTalk こんばんわ、ずんだもんなのだ。

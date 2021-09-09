@@ -15,6 +15,14 @@ export async function main(denops: Denops): Promise<void> {
       ensureNumber(line1);
       ensureNumber(line2);
       ensureNumber(count);
+
+      const API_BASE = await vars.g.get(denops, "voicevox_api_entrypoint", "http://127.0.0.1:50021/");
+      const speaker = await vars.g.get(denops, "voicevox_speaker", 1);
+      ensureString(API_BASE);
+      ensureNumber(speaker);
+
+      const api = ky.create({ prefixUrl: API_BASE });
+
       const mes = await Promise.resolve(text);
       if (mes.length == 0) {
         const lines = await denops.call("getline", line1, line2) as string[];
@@ -23,8 +31,8 @@ export async function main(denops: Denops): Promise<void> {
           return
         }
         for (let i = 0; i < lines.length; i++) {
-          const query = await audioQuery(denops, lines[i]);
-          const wavFile = await synthesis(denops, query);
+          const query = await audioQuery(api, speaker, lines[i]);
+          const wavFile = await synthesis(api, speaker, query);
           await vimFn.sound_playfile(denops, wavFile.path);
           if (i != lines.length - 1) {
             // 最後のファイルはスリープしない
@@ -32,8 +40,8 @@ export async function main(denops: Denops): Promise<void> {
           }
         }
       } else {
-        const query = await audioQuery(denops, mes);
-        const wavFile = await synthesis(denops, query);
+        const query = await audioQuery(api, speaker, mes);
+        const wavFile = await synthesis(api, speaker, query);
         await vimFn.sound_playfile(denops, wavFile.path);
       }
     },
@@ -44,12 +52,7 @@ export async function main(denops: Denops): Promise<void> {
   );
 }
 
-async function audioQuery(denops: Denops, text: string) : Promise<apiTypes.AudioQueryRes> {
-  const API_BASE = await vars.g.get(denops, "voicevox_api_entrypoint", "http://127.0.0.1:50021/");
-  const speaker = await vars.g.get(denops, "voicevox_speaker", 1);
-  ensureString(API_BASE);
-  ensureNumber(speaker);
-  const api = ky.default.create({ prefixUrl: API_BASE });
+async function audioQuery(api: typeof ky, speaker: number, text: string) : Promise<apiTypes.AudioQueryRes> {
   const result = await api.post("audio_query", {
     searchParams: {
       text: text,
@@ -59,12 +62,7 @@ async function audioQuery(denops: Denops, text: string) : Promise<apiTypes.Audio
   return result;
 }
 
-async function synthesis(denops: Denops, query: apiTypes.AudioQueryRes) : Promise<FileInfo> {
-  const API_BASE = await vars.g.get(denops, "voicevox_api_entrypoint", "http://127.0.0.1:50021/");
-  const speaker = await vars.g.get(denops, "voicevox_speaker", 1);
-  ensureString(API_BASE);
-  ensureNumber(speaker);
-  const api = ky.default.create({ prefixUrl: API_BASE });
+async function synthesis(api: typeof ky, speaker: number, query: apiTypes.AudioQueryRes) : Promise<FileInfo> {
   const headers = new Headers({
     'Accept': 'audio/wav'
   });
